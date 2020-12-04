@@ -1,0 +1,15 @@
+{
+    "name": "oracleseqwriter",
+    "parameter": {
+        "username": "",
+        "password": "",
+        "column": [{"index":1,"name":"","type":"value/seq/where"}],
+        "preSql": [],
+        "connection": [
+            {
+                "jdbcUrl": "",
+                "table": []
+            }
+        ]
+    }
+}
