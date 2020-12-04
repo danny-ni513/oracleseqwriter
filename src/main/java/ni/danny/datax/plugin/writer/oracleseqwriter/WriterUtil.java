@@ -104,7 +104,7 @@ public final class WriterUtil {
 
     public static String getWriteTemplate(List<OracleColumnCell> columnHolders, String valueHolder, String writeMode, DataBaseType dataBaseType, boolean forceUseUpdate) {
         boolean isWriteModeLegal = writeMode.trim().toLowerCase().startsWith("insert")
-                || writeMode.trim().toLowerCase().startsWith("merger")
+                || writeMode.trim().toLowerCase().startsWith("merge")
                 || writeMode.trim().toLowerCase().startsWith("update");
 
         if (!isWriteModeLegal) {
