@@ -192,8 +192,9 @@ public final class DBUtil {
                 String[] params = grantRecord.split("\\`");
                 if (params != null && params.length >= 3) {
                     String tableName = params[3];
-                    if (params[0].contains("INSERT") && !tableName.equals("*") && tableNames.contains(tableName))
+                    if (params[0].contains("INSERT") && !tableName.equals("*") && tableNames.contains(tableName)){
                         tableNames.remove(tableName);
+                    }
                 } else {
                     if (grantRecord.contains("INSERT") ||grantRecord.contains("ALL PRIVILEGES")) {
                         if (grantRecord.contains("*.*")){
@@ -208,8 +209,9 @@ public final class DBUtil {
         } catch (Exception e) {
             LOG.warn("Check the database has the Insert Privilege failed, errorMessage:[{}]", e.getMessage());
         }
-        if (tableNames.isEmpty())
+        if (tableNames.isEmpty()){
             return true;
+        }
         return false;
     }
 
@@ -586,7 +588,7 @@ public final class DBUtil {
         try {
             connection = connect(dataBaseType, url, user, pass);
             if (connection != null) {
-                if (dataBaseType.equals(dataBaseType.MySql) && checkSlave) {
+                if (dataBaseType.equals(DataBaseType.MySql) && checkSlave) {
                     //dataBaseType.MySql
                     boolean connOk = !isSlaveBehind(connection);
                     return connOk;
@@ -800,11 +802,12 @@ public final class DBUtil {
         }
     }
 
-    public static List<OracleColumnCell> parseColumn(List<Map> columnList){
-        List<OracleColumnCell> hbaseColumnCells = new ArrayList<OracleColumnCell>();
-        OracleColumnCell oneColumnCell;
-        for (Map<String, String> aColumn : columnList) {
-            ColumnType columnType = ColumnType.getByTypeName(aColumn.get(Key.TYPE));
+    public static OracleColumnCell parseOneColumnByMap(Map<String,String> aColumn){
+
+          ColumnType columnType = ColumnType.VALUE;
+            if(StringUtils.isNotBlank(aColumn.get(Key.TYPE))){
+                columnType = ColumnType.getByTypeName(aColumn.get(Key.TYPE));
+            }
             String columnName = aColumn.get(Key.NAME);
             String index = aColumn.get(Key.INDEX);
             String seqName = aColumn.get(Key.SEQ_NAME);
@@ -814,15 +817,38 @@ public final class DBUtil {
             if(StringUtils.isNotBlank(index)&&StringUtils.isNumeric(index)){
                 columnIndex = Integer.parseInt(index);
             }
-            oneColumnCell = new OracleColumnCell.Builder()
+        OracleColumnCell oneColumnCell = new OracleColumnCell.Builder()
                     .setColumnType(columnType)
                     .setColumnIndex(columnIndex)
                     .setColumnName(columnName)
                     .setSeqName(seqName)
                     .setDefaultValue(defaultValue)
                     .build();
-            hbaseColumnCells.add(oneColumnCell);
+
+        return oneColumnCell;
+    }
+
+    public static OracleColumnCell parseOneColumnByString(String column,int index){
+
+        Map<String,String> columnMap = new HashMap<String,String>();
+            columnMap.put(Key.NAME,column);
+            columnMap.put(Key.TYPE,"value");
+            columnMap.put(Key.INDEX,(index+1)+"");
+
+        return DBUtil.parseOneColumnByMap(columnMap);
+    }
+
+    public static List<OracleColumnCell> parseColumn(List<Object> columnList) {
+        List<OracleColumnCell> columnCells = new ArrayList<>(columnList.size());
+        for(int i=0,z=columnList.size();i<z;i++){
+            if(columnList.get(i) instanceof String){
+                columnCells.add(DBUtil.parseOneColumnByString((String)columnList.get(i),i));
+            }else if(columnList.get(i) instanceof Map){
+                columnCells.add(DBUtil.parseOneColumnByMap((Map<String,String>)columnList.get(i)));
+            }else{
+                LOG.warn("UNSUPPORTED THE COLUMN TYPE, JUST LIKE ['',''] OR [{},{}]");
+            }
         }
-        return hbaseColumnCells;
+        return columnCells;
     }
 }

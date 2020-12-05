@@ -90,8 +90,8 @@ public final class OriginalConfPretreatmentUtil {
     }
 
     public static void dealColumnConf(Configuration originalConfig, ConnectionFactory connectionFactory, String oneTable) {
-        List<Map> userConfiguredColumnsMap = originalConfig.getList(Key.COLUMN, Map.class);
-        List<OracleColumnCell> userConfiguredColumns = DBUtil.parseColumn(userConfiguredColumnsMap);
+        List<Object> userConfiguredColumnsObject = originalConfig.getList(Key.COLUMN);
+        List<OracleColumnCell> userConfiguredColumns = DBUtil.parseColumn(userConfiguredColumnsObject);
 
         if (null == userConfiguredColumns || userConfiguredColumns.isEmpty()) {
             throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE,
@@ -146,7 +146,7 @@ public final class OriginalConfPretreatmentUtil {
     }
 
     public static void dealWriteMode(Configuration originalConfig, DataBaseType dataBaseType) {
-        List<Map> mapColumns = originalConfig.getList(Key.COLUMN, Map.class);
+        List<Object> mapColumns = originalConfig.getList(Key.COLUMN);
         List<OracleColumnCell> columns = DBUtil.parseColumn(mapColumns);
 
         String jdbcUrl = originalConfig.getString(String.format("%s[0].%s",

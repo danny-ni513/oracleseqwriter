@@ -203,9 +203,9 @@ public class OracleSeqWriter extends Writer {
             this.jdbcUrl = this.writerSliceConfig.getString(Key.JDBC_URL);
 
             this.table = this.writerSliceConfig.getString(Key.TABLE);
+            List<Object> columnTmpList = this.writerSliceConfig.getList(Key.COLUMN);
 
-            List<Map> columnMapList = this.writerSliceConfig.getList(Key.COLUMN, Map.class);
-            this.columns = DBUtil.parseColumn(columnMapList);
+            this.columns = DBUtil.parseColumn(columnTmpList);
             List tmpColumnNames  = new ArrayList<>(this.columns.size());
             for(OracleColumnCell columnCell : this.columns){
                 tmpColumnNames.add(columnCell.getColumnName());
