@@ -173,6 +173,7 @@ public class OracleSeqWriter extends Writer {
         protected String jdbcUrl;
         protected String table;
         protected List<OracleColumnCell> columns;
+        protected List<String> columnNames;
         protected boolean needOrder = false;
         protected List<String> preSqls;
         protected List<String> postSqls;
@@ -205,6 +206,12 @@ public class OracleSeqWriter extends Writer {
 
             List<Map> columnMapList = this.writerSliceConfig.getList(Key.COLUMN, Map.class);
             this.columns = DBUtil.parseColumn(columnMapList);
+            List tmpColumnNames  = new ArrayList<>(this.columns.size());
+            for(OracleColumnCell columnCell : this.columns){
+                tmpColumnNames.add(columnCell.getColumnName());
+            }
+            this.columnNames = tmpColumnNames;
+
             this.needOrder = checkNeedOrder();
             this.columnNumber = this.columns.size();
             this.valueColumnNumber = calcColumnNumberByType(ColumnType.VALUE);
@@ -275,7 +282,7 @@ public class OracleSeqWriter extends Writer {
 
         public void startWriteWithConnection(RecordReceiver recordReceiver,Connection connection){
 
-            this.resultSetMetaData = DBUtil.getColumnMetaData(connection,this.table,StringUtils.join(this.columns,","));
+            this.resultSetMetaData = DBUtil.getColumnMetaData(connection,this.table,StringUtils.join(this.columnNames,","));
 
             calcWriteRecordSql();
             LOG.info("writeRecordSql is ==>[{}]",this.writeRecordSql);
@@ -378,9 +385,13 @@ public class OracleSeqWriter extends Writer {
         }
 
         protected PreparedStatement fillPreparedStatement(PreparedStatement preparedStatement,Record record) throws SQLException{
-            for (int i = 0; i < this.columnNumber; i++) {
-                int columnSqltype = this.resultSetMetaData.getMiddle().get(i);
-                preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqltype, record.getColumn(i));
+            int i=0;
+            for (OracleColumnCell columnCell :this.columns) {
+                if(ColumnType.VALUE.equals(columnCell.getColumnType())||ColumnType.WHERE.equals(columnCell.getColumnType())){
+                    int columnSqltype = this.resultSetMetaData.getMiddle().get(i);
+                    preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqltype, record.getColumn(i));
+                    i++;
+                }
             }
 
             return preparedStatement;

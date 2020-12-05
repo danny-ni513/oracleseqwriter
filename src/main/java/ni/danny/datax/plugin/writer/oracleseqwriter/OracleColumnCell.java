@@ -12,6 +12,8 @@ public class OracleColumnCell extends BaseObject implements Serializable, Compar
     private String columnName;
     private int columnIndex;
     private String seqName;
+    private String defaultValue;
+
 
     public ColumnType getColumnType() {
         return columnType;
@@ -29,11 +31,14 @@ public class OracleColumnCell extends BaseObject implements Serializable, Compar
         return seqName;
     }
 
+    public String getDefaultValue(){ return defaultValue; }
+
     private OracleColumnCell(Builder builder){
         this.columnType = builder.columnType;
         this.columnIndex = builder.columnIndex;
         this.columnName = builder.columnName;
         this.seqName = builder.seqName;
+        this.defaultValue = builder.defaultValue;
     }
 
     @Override
@@ -49,13 +54,17 @@ public class OracleColumnCell extends BaseObject implements Serializable, Compar
         private String columnName;
         private int columnIndex;
         private String seqName;
+        private String defaultValue;
+
+        public Builder setDefaultValue(String defaultValue) {
+            this.defaultValue = defaultValue;
+            return this;
+        }
 
         public Builder setSeqName(String seqName) {
             this.seqName = seqName;
             return this;
         }
-
-
 
         public Builder setColumnType(ColumnType columnType) {
             this.columnType = columnType;

@@ -124,21 +124,21 @@ public final class WriterUtil {
                         columsStr.append(",");
                         valueStr.append(",");
                     }
-                    columsStr.append(columnHolders.get(i));
+                    columsStr.append(columnHolders.get(i).getColumnName());
                     valueStr.append(columnHolders.get(i).getSeqName()+".nextval");
                 }else if(ColumnType.VALUE.equals(columnHolders.get(i).getColumnType())){
                     if(i>0){
                         columsStr.append(",");
                         valueStr.append(",");
                     }
-                    columsStr.append(columnHolders.get(i));
+                    columsStr.append(columnHolders.get(i).getColumnName());
                     valueStr.append(valueHolder);
                 }
             }
 
             writeDataSqlTemplate = new StringBuilder()
                     .append("INSERT INTO %s (").append(columsStr)
-                    .append(") VALUES(").append(valueHolder)
+                    .append(") VALUES(").append(valueStr)
                     .append(")")
                     .toString();
 

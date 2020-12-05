@@ -808,6 +808,8 @@ public final class DBUtil {
             String columnName = aColumn.get(Key.NAME);
             String index = aColumn.get(Key.INDEX);
             String seqName = aColumn.get(Key.SEQ_NAME);
+            String defaultValue = aColumn.get(Key.DEFAULT_VALUE);
+
             int columnIndex = -1;
             if(StringUtils.isNotBlank(index)&&StringUtils.isNumeric(index)){
                 columnIndex = Integer.parseInt(index);
@@ -817,6 +819,7 @@ public final class DBUtil {
                     .setColumnIndex(columnIndex)
                     .setColumnName(columnName)
                     .setSeqName(seqName)
+                    .setDefaultValue(defaultValue)
                     .build();
             hbaseColumnCells.add(oneColumnCell);
         }

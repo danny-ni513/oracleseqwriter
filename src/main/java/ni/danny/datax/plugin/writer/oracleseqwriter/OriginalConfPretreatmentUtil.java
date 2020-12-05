@@ -90,7 +90,9 @@ public final class OriginalConfPretreatmentUtil {
     }
 
     public static void dealColumnConf(Configuration originalConfig, ConnectionFactory connectionFactory, String oneTable) {
-        List<String> userConfiguredColumns = originalConfig.getList(Key.COLUMN, String.class);
+        List<Map> userConfiguredColumnsMap = originalConfig.getList(Key.COLUMN, Map.class);
+        List<OracleColumnCell> userConfiguredColumns = DBUtil.parseColumn(userConfiguredColumnsMap);
+
         if (null == userConfiguredColumns || userConfiguredColumns.isEmpty()) {
             throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE,
                     "您的配置文件中的列配置信息有误. 因为您未配置写入数据库表的列名称，DataX获取不到列信息. 请检查您的配置并作出修改.");
@@ -117,10 +119,15 @@ public final class OriginalConfPretreatmentUtil {
                                 userConfiguredColumns.size(), allColumns.size()));
             } else {
                 // 确保用户配置的 column 不重复
-                ListUtil.makeSureNoValueDuplicate(userConfiguredColumns, false);
+                List<String> userConfiguredColumnNames = new ArrayList<>(userConfiguredColumns.size());
+                for(OracleColumnCell columnCell:userConfiguredColumns){
+                    userConfiguredColumnNames.add(columnCell.getColumnName());
+                }
+
+                ListUtil.makeSureNoValueDuplicate(userConfiguredColumnNames, false);
 
                 // 检查列是否都为数据库表中正确的列（通过执行一次 select column from table 进行判断）
-                DBUtil.getColumnMetaData(connectionFactory.getConnecttion(), oneTable,StringUtils.join(userConfiguredColumns, ","));
+                DBUtil.getColumnMetaData(connectionFactory.getConnecttion(), oneTable,StringUtils.join(userConfiguredColumnNames, ","));
             }
         }
     }

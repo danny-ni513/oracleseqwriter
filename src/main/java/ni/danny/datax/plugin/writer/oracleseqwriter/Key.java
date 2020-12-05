@@ -15,6 +15,8 @@ public final class Key {
 
     public final static String SEQ_NAME ="seqName";
 
+    public final static String DEFAULT_VALUE = "defaultValue";
+
     public final static String TYPE = "type";
 
     public final static String NAME = "name";
