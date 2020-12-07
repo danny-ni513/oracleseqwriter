@@ -150,42 +150,78 @@ public final class WriterUtil {
             StringBuilder insertColumnsStr = new StringBuilder();
             StringBuilder insertValuesStr = new StringBuilder();
 
-            for(int i=0,z=columnHolders.size();i<z;i++){
-                OracleColumnCell columnCell = columnHolders.get(i);
+            boolean usingSqlFirst = true;
+            boolean onSqlFirst = true;
+            boolean insertColumnsFirst = true;
+            boolean insertValuesFirst = true;
+            boolean updateSqlFirst = true;
+
+
+
+            for(OracleColumnCell columnCell:columnHolders){
+
+                if(insertColumnsFirst){
+                    insertColumnsFirst =false;
+                }else{
+                    insertColumnsStr.append(",");
+                }
+                insertColumnsStr.append(" "+columnCell.getColumnName()+"  \r\n");
 
                 if(ColumnType.WHERE.equals(columnCell.getColumnType())){
-
-                    if(i>0){
+                    if(usingSqlFirst){
+                        usingSqlFirst=false;
+                    }else {
                         usingSqlStr.append(", ");
-                        onSqlStr.append("and ");
-                        insertColumnsStr.append(",");
-                        insertValuesStr.append(",");
                     }
+
                     usingSqlStr.append(" "+valueHolder+" as "+columnCell.getColumnName()+" ");
-                    onSqlStr.append(" tab1."+columnCell.getColumnName()+"=tab2."+columnCell.getColumnName()+" ");
-                    insertColumnsStr.append(" "+columnCell.getColumnName()+" ");
+
+                    if(onSqlFirst){
+                        onSqlFirst =false;
+                    }else{
+                        onSqlStr.append("and ");
+                    }
+
+                    onSqlStr.append(" tab1."+columnCell.getColumnName()+"=tab2."+columnCell.getColumnName()+" \r\n");
+
+
+                    if(insertValuesFirst){
+                        insertValuesFirst =false;
+                    }else{
+                        insertValuesStr.append(", ");
+                    }
+
                     insertValuesStr.append(" tab2."+columnCell.getColumnName()+" ");
 
                 }else if(ColumnType.SEQ.equals(columnCell.getColumnType())){
 
-                    if(i>0){
-                        usingSqlStr.append(", ");
-                        insertColumnsStr.append(",");
-                        insertValuesStr.append(",");
+                    if(insertValuesFirst){
+                        insertValuesFirst =false;
+                    }else{
+                        insertValuesStr.append(", ");
                     }
-                    usingSqlStr.append(" "+valueHolder+" as "+columnCell.getColumnName()+" ");
-                    insertColumnsStr.append(" "+columnCell.getColumnName()+" ");
+
                     insertValuesStr.append(" "+columnCell.getSeqName()+".nextval ");
                 }else if(ColumnType.VALUE.equals(columnCell.getColumnType())){
-                    if(i>0){
+                    if(usingSqlFirst){
+                        usingSqlFirst=false;
+                    }else {
                         usingSqlStr.append(", ");
-                        updateSqlStr.append(", ");
-                        insertColumnsStr.append(",");
-                        insertValuesStr.append(",");
                     }
                     usingSqlStr.append(" "+valueHolder+" as "+columnCell.getColumnName()+" ");
-                    updateSqlStr.append(" tab1."+columnCell.getColumnName()+" = tab2."+columnCell.getColumnName()+" ");
-                    insertColumnsStr.append(" "+columnCell.getColumnName()+" ");
+
+                    if(updateSqlFirst){
+                        updateSqlFirst = false;
+                    }else{
+                        updateSqlStr.append(" , ");
+                    }
+                    updateSqlStr.append(" tab1."+columnCell.getColumnName()+" = tab2."+columnCell.getColumnName()+" \r\n");
+
+                    if(insertValuesFirst){
+                        insertValuesFirst =false;
+                    }else{
+                        insertValuesStr.append(", ");
+                    }
                     insertValuesStr.append(" tab2."+columnCell.getColumnName()+" ");
                 }
             }

@@ -285,7 +285,7 @@ public class OracleSeqWriter extends Writer {
             this.resultSetMetaData = DBUtil.getColumnMetaData(connection,this.table,StringUtils.join(this.columnNames,","));
 
             calcWriteRecordSql();
-            LOG.info("writeRecordSql is ==>[{}]",this.writeRecordSql);
+            //LOG.info("writeRecordSql is ==>[{}]",this.writeRecordSql);
 
             List<Record> writeBuffer = new ArrayList<Record>(this.batchSize);
             int bufferBytes = 0;
