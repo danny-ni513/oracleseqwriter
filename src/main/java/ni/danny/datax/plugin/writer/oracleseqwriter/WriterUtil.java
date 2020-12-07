@@ -142,7 +142,7 @@ public final class WriterUtil {
                     .append(")")
                     .toString();
 
-        }else if(writeMode.trim().toLowerCase().startsWith("merger")){
+        }else if(writeMode.trim().toLowerCase().startsWith("merge")){
 
             StringBuilder usingSqlStr = new StringBuilder().append(" select ");
             StringBuilder onSqlStr = new StringBuilder();
@@ -158,9 +158,14 @@ public final class WriterUtil {
                     if(i>0){
                         usingSqlStr.append(", ");
                         onSqlStr.append("and ");
+                        insertColumnsStr.append(",");
+                        insertValuesStr.append(",");
                     }
                     usingSqlStr.append(" "+valueHolder+" as "+columnCell.getColumnName()+" ");
                     onSqlStr.append(" tab1."+columnCell.getColumnName()+"=tab2."+columnCell.getColumnName()+" ");
+                    insertColumnsStr.append(" "+columnCell.getColumnName()+" ");
+                    insertValuesStr.append(" tab2."+columnCell.getColumnName()+" ");
+
                 }else if(ColumnType.SEQ.equals(columnCell.getColumnType())){
 
                     if(i>0){

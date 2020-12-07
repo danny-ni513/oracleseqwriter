@@ -802,7 +802,7 @@ public final class DBUtil {
         }
     }
 
-    public static OracleColumnCell parseOneColumnByMap(Map<String,String> aColumn){
+    public static OracleColumnCell parseOneColumnByMap(Map<String,String> aColumn,int inputIndex){
 
           ColumnType columnType = ColumnType.VALUE;
             if(StringUtils.isNotBlank(aColumn.get(Key.TYPE))){
@@ -816,6 +816,8 @@ public final class DBUtil {
             int columnIndex = -1;
             if(StringUtils.isNotBlank(index)&&StringUtils.isNumeric(index)){
                 columnIndex = Integer.parseInt(index);
+            }else{
+                columnIndex = inputIndex;
             }
         OracleColumnCell oneColumnCell = new OracleColumnCell.Builder()
                     .setColumnType(columnType)
@@ -835,7 +837,7 @@ public final class DBUtil {
             columnMap.put(Key.TYPE,"value");
             columnMap.put(Key.INDEX,(index+1)+"");
 
-        return DBUtil.parseOneColumnByMap(columnMap);
+        return DBUtil.parseOneColumnByMap(columnMap,index);
     }
 
     public static List<OracleColumnCell> parseColumn(List<Object> columnList) {
@@ -844,7 +846,7 @@ public final class DBUtil {
             if(columnList.get(i) instanceof String){
                 columnCells.add(DBUtil.parseOneColumnByString((String)columnList.get(i),i));
             }else if(columnList.get(i) instanceof Map){
-                columnCells.add(DBUtil.parseOneColumnByMap((Map<String,String>)columnList.get(i)));
+                columnCells.add(DBUtil.parseOneColumnByMap((Map<String,String>)columnList.get(i),i));
             }else{
                 LOG.warn("UNSUPPORTED THE COLUMN TYPE, JUST LIKE ['',''] OR [{},{}]");
             }
