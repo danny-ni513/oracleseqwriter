@@ -388,8 +388,8 @@ public class OracleSeqWriter extends Writer {
             int i=0;
             for (OracleColumnCell columnCell :this.columns) {
                 if(ColumnType.VALUE.equals(columnCell.getColumnType())||ColumnType.WHERE.equals(columnCell.getColumnType())){
-                    int columnSqltype = this.resultSetMetaData.getMiddle().get(i);
-                    preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqltype, record.getColumn(i));
+                    int columnSqlType = this.resultSetMetaData.getMiddle().get(i);
+                    preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqlType, record.getColumn(i));
                     i++;
                 }
             }
