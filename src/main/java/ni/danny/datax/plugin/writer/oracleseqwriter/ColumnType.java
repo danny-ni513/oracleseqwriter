@@ -8,7 +8,11 @@ import java.util.Arrays;
 public enum ColumnType {
     SEQ("seq"),
     VALUE("value"),
-    WHERE("where")
+    WHERE("where"),
+    CONST("const"),
+    DATE("date"),
+    WHERE_DATE("where_date"),
+    WHERE_CONST("where_const")
     ;
     private String typeName;
 

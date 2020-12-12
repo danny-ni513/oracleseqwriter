@@ -812,6 +812,8 @@ public final class DBUtil {
             String index = aColumn.get(Key.INDEX);
             String seqName = aColumn.get(Key.SEQ_NAME);
             String defaultValue = aColumn.get(Key.DEFAULT_VALUE);
+            String value = aColumn.get(Key.VALUE);
+            String format = aColumn.get(Key.FORMAT);
 
             int columnIndex = -1;
             if(StringUtils.isNotBlank(index)&&StringUtils.isNumeric(index)){
@@ -825,6 +827,8 @@ public final class DBUtil {
                     .setColumnName(columnName)
                     .setSeqName(seqName)
                     .setDefaultValue(defaultValue)
+                    .setValue(value)
+                    .setFormat(format)
                     .build();
 
         return oneColumnCell;

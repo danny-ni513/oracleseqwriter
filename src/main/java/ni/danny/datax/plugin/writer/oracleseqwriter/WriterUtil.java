@@ -114,30 +114,71 @@ public final class WriterUtil {
         String writeDataSqlTemplate = null;
         if(writeMode.trim().toLowerCase().startsWith("insert")){
 
-            StringBuilder columsStr = new StringBuilder();
+            StringBuilder columnsStr = new StringBuilder();
             StringBuilder valueStr = new StringBuilder();
-            for(int i=0,z=columnHolders.size();i<z;i++){
 
+            boolean firstColumn = true;
+            boolean firstValue = true;
 
-                if(ColumnType.SEQ.equals(columnHolders.get(i).getColumnType())){
-                    if(i>0){
-                        columsStr.append(",");
+            for(OracleColumnCell columnCell:columnHolders){
+
+                if(ColumnType.SEQ.equals(columnCell.getColumnType())){
+                    if(firstColumn){
+                        firstColumn = false;
+                    }else{
+                        columnsStr.append(",");
+                    }
+                    if(firstValue){
+                        firstValue = false;
+                    }else{
                         valueStr.append(",");
                     }
-                    columsStr.append(columnHolders.get(i).getColumnName());
-                    valueStr.append(columnHolders.get(i).getSeqName()+".nextval");
-                }else if(ColumnType.VALUE.equals(columnHolders.get(i).getColumnType())){
-                    if(i>0){
-                        columsStr.append(",");
+                    columnsStr.append(columnCell.getColumnName());
+                    valueStr.append(columnCell.getSeqName()+".nextval  ");
+                }else if(ColumnType.CONST.equals(columnCell.getColumnType())||ColumnType.WHERE_CONST.equals(columnCell.getColumnType())){
+                    if(firstColumn){
+                        firstColumn = false;
+                    }else{
+                        columnsStr.append(",");
+                    }
+                    if(firstValue){
+                        firstValue = false;
+                    }else{
                         valueStr.append(",");
                     }
-                    columsStr.append(columnHolders.get(i).getColumnName());
+                    columnsStr.append(columnCell.getColumnName());
+                    valueStr.append(" '"+columnCell.getValue()+"' ");
+                }else if(ColumnType.DATE.equals(columnCell.getColumnType())||ColumnType.WHERE_DATE.equals(columnCell.getColumnType())){
+                    if(firstColumn){
+                        firstColumn = false;
+                    }else{
+                        columnsStr.append(",");
+                    }
+                    if(firstValue){
+                        firstValue = false;
+                    }else{
+                        valueStr.append(",");
+                    }
+                    columnsStr.append(columnCell.getColumnName());
+                    valueStr.append("  to_date('"+columnCell.getValue()+"','"+columnCell.getFormat()+"') ");
+                }else{
+                    if(firstColumn){
+                        firstColumn = false;
+                    }else{
+                        columnsStr.append(",");
+                    }
+                    if(firstValue){
+                        firstValue = false;
+                    }else{
+                        valueStr.append(",");
+                    }
+                    columnsStr.append(columnCell.getColumnName());
                     valueStr.append(valueHolder);
                 }
             }
 
             writeDataSqlTemplate = new StringBuilder()
-                    .append("INSERT INTO %s (").append(columsStr)
+                    .append("INSERT INTO %s (").append(columnsStr)
                     .append(") VALUES(").append(valueStr)
                     .append(")")
                     .toString();
@@ -155,8 +196,6 @@ public final class WriterUtil {
             boolean insertColumnsFirst = true;
             boolean insertValuesFirst = true;
             boolean updateSqlFirst = true;
-
-
 
             for(OracleColumnCell columnCell:columnHolders){
 
@@ -193,6 +232,44 @@ public final class WriterUtil {
 
                     insertValuesStr.append(" tab2."+columnCell.getColumnName()+" ");
 
+                }else if(ColumnType.WHERE_CONST.equals(columnCell.getColumnType())){
+
+                    if(onSqlFirst){
+                        onSqlFirst =false;
+                    }else{
+                        onSqlStr.append(" and ");
+                    }
+
+                    onSqlStr.append(" tab1."+columnCell.getColumnName()+"='"+columnCell.getValue()+"' \r\n");
+
+
+                    if(insertValuesFirst){
+                        insertValuesFirst =false;
+                    }else{
+                        insertValuesStr.append(", ");
+                    }
+
+                    insertValuesStr.append(" '"+columnCell.getValue()+"' ");
+
+                }else if(ColumnType.WHERE_DATE.equals(columnCell.getColumnType())){
+
+                    if(onSqlFirst){
+                        onSqlFirst =false;
+                    }else{
+                        onSqlStr.append(" and ");
+                    }
+
+                    onSqlStr.append(" tab1."+columnCell.getColumnName()+"= to_date('"+columnCell.getValue()+"','"+columnCell.getFormat()+"')  \r\n");
+
+
+                    if(insertValuesFirst){
+                        insertValuesFirst =false;
+                    }else{
+                        insertValuesStr.append(", ");
+                    }
+
+                    insertValuesStr.append("   to_date('"+columnCell.getValue()+"','"+columnCell.getFormat()+"')   ");
+
                 }else if(ColumnType.SEQ.equals(columnCell.getColumnType())){
 
                     if(insertValuesFirst){
@@ -202,6 +279,38 @@ public final class WriterUtil {
                     }
 
                     insertValuesStr.append(" "+columnCell.getSeqName()+".nextval ");
+                }else if(ColumnType.CONST.equals(columnCell.getColumnType())){
+
+                    if(updateSqlFirst){
+                        updateSqlFirst = false;
+                    }else{
+                        updateSqlStr.append(" , ");
+                    }
+                    updateSqlStr.append(" tab1."+columnCell.getColumnName()+" = "+columnCell.getValue()+" \r\n");
+
+                    if(insertValuesFirst){
+                        insertValuesFirst =false;
+                    }else{
+                        insertValuesStr.append(", ");
+                    }
+                    insertValuesStr.append(" "+columnCell.getValue()+" ");
+
+                }else if(ColumnType.DATE.equals(columnCell.getColumnType())){
+
+                    if(updateSqlFirst){
+                        updateSqlFirst = false;
+                    }else{
+                        updateSqlStr.append(" , ");
+                    }
+                    updateSqlStr.append(" tab1."+columnCell.getColumnName()+" = TO_DATE('"+columnCell.getValue()+"','"+columnCell.getFormat()+"') \r\n");
+
+                    if(insertValuesFirst){
+                        insertValuesFirst =false;
+                    }else{
+                        insertValuesStr.append(", ");
+                    }
+                    insertValuesStr.append("  TO_DATE('"+columnCell.getValue()+"','"+columnCell.getFormat()+"')  ");
+
                 }else if(ColumnType.VALUE.equals(columnCell.getColumnType())){
                     if(usingSqlFirst){
                         usingSqlFirst=false;
@@ -250,29 +359,77 @@ public final class WriterUtil {
             StringBuilder setSqlStr = new StringBuilder();
             StringBuilder whereSqlStr = new StringBuilder();
 
-            for(int i=0,z=columnHolders.size();i<z;i++){
-                OracleColumnCell columnCell = columnHolders.get(i);
+            boolean firstSetSql = true;
+            boolean firstWhereSql = true;
+
+            for(OracleColumnCell columnCell:columnHolders){
+
                 if(ColumnType.SEQ.equals(columnCell.getColumnType())){
-                    if(i>0){
+                    if(firstSetSql){
+                        firstSetSql = false;
+                    }else{
                         setSqlStr.append(", ");
                     }
                     setSqlStr.append(columnCell.getColumnName()+"="+columnCell.getSeqName()+".nextval ");
                 }else if(ColumnType.VALUE.equals(columnCell.getColumnType())){
-                    if(i>0){
+                    if(firstSetSql){
+                        firstSetSql = false;
+                    }else{
                         setSqlStr.append(", ");
                     }
                     setSqlStr.append(columnCell.getColumnName()+"="+valueHolder);
-                }else if(ColumnType.WHERE.equals(columnCell.getColumnType())){
-                    if(i>0){
+                }else if(ColumnType.WHERE.equals(columnCell.getColumnType())
+                ||ColumnType.WHERE_DATE.equals(columnCell.getColumnType())
+                ||ColumnType.WHERE_CONST.equals(columnCell.getColumnType())){
+                    if(firstWhereSql){
+                        firstWhereSql = false;
+                    }else{
                         whereSqlStr.append(" and ");
                     }
-                    whereSqlStr.append(" "+columnCell.getColumnName()+"="+valueHolder+" ");
+                    if(ColumnType.WHERE.equals(columnCell.getColumnType())){
+                        whereSqlStr.append(" "+columnCell.getColumnName()+"="+valueHolder+" ");
+                    }else if(ColumnType.WHERE_DATE.equals(columnCell.getColumnType())){
+                        whereSqlStr.append(" "+columnCell.getColumnName()+"= to_date('"+columnCell.getValue()+"','"+columnCell.getFormat()+"') ");
+                    }if(ColumnType.WHERE_CONST.equals(columnCell.getColumnType())){
+                        whereSqlStr.append(" "+columnCell.getColumnName()+"='"+columnCell.getValue()
+                                +"' ");
+                    }
                 }
             }
 
             writeDataSqlTemplate = new StringBuilder()
                     .append("UPDATE %s set ")
                     .append(setSqlStr)
+                    .append(" where ")
+                    .append(whereSqlStr)
+                    .toString();
+        }else if(writeMode.trim().toLowerCase().startsWith("delete")){
+
+            StringBuilder whereSqlStr = new StringBuilder();
+            boolean firstWhere = true;
+
+            for(OracleColumnCell columnCell:columnHolders){
+                if(ColumnType.WHERE.equals(columnCell.getColumnType())||
+                        ColumnType.WHERE_DATE.equals(columnCell.getColumnType())||
+                        ColumnType.WHERE_CONST.equals(columnCell.getColumnType())){
+                    if(firstWhere){
+                        firstWhere = false;
+                    }else{
+                        whereSqlStr.append(" and ");
+                    }
+
+                    if(ColumnType.WHERE.equals(columnCell.getColumnType())){
+                        whereSqlStr.append( columnCell.getColumnName() +"="+ valueHolder+" ");
+                    }else if(ColumnType.WHERE_CONST.equals(columnCell.getColumnType())){
+                        whereSqlStr.append( columnCell.getColumnName() +"='"+columnCell.getValue()+"' ");
+                    }else if(ColumnType.WHERE_DATE.equals(columnCell.getColumnType())){
+                        whereSqlStr.append( columnCell.getColumnName() +"=to_date('"+ columnCell.getValue()+"','"+columnCell.getFormat()+"') ");
+                    }
+                }
+            }
+
+            writeDataSqlTemplate = new StringBuilder()
+                    .append("delete from %s  ")
                     .append(" where ")
                     .append(whereSqlStr)
                     .toString();

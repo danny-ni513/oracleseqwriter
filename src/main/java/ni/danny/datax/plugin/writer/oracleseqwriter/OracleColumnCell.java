@@ -13,7 +13,16 @@ public class OracleColumnCell extends BaseObject implements Serializable, Compar
     private int columnIndex;
     private String seqName;
     private String defaultValue;
+    private String value;
+    private String format;
 
+    public String getValue() {
+        return value;
+    }
+
+    public String getFormat() {
+        return format;
+    }
 
     public ColumnType getColumnType() {
         return columnType;
@@ -39,6 +48,8 @@ public class OracleColumnCell extends BaseObject implements Serializable, Compar
         this.columnName = builder.columnName;
         this.seqName = builder.seqName;
         this.defaultValue = builder.defaultValue;
+        this.value = builder.value;
+        this.format = builder.format;
     }
 
     @Override
@@ -55,6 +66,18 @@ public class OracleColumnCell extends BaseObject implements Serializable, Compar
         private int columnIndex;
         private String seqName;
         private String defaultValue;
+        private String value;
+        private String format;
+
+        public Builder setValue(String value) {
+            this.value = value;
+            return this;
+        }
+
+        public Builder setFormat(String format) {
+            this.format = format;
+            return this;
+        }
 
         public Builder setDefaultValue(String defaultValue) {
             this.defaultValue = defaultValue;

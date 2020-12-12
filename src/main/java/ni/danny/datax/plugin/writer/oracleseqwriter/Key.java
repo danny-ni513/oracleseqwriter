@@ -17,6 +17,10 @@ public final class Key {
 
     public final static String DEFAULT_VALUE = "defaultValue";
 
+    public final static String VALUE = "value";
+
+    public final static String FORMAT = "format";
+
     public final static String TYPE = "type";
 
     public final static String NAME = "name";
