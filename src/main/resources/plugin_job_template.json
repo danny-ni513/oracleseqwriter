@@ -1,9 +1,10 @@
 {
     "name": "oracleseqwriter",
     "parameter": {
+        "writeMode": "insert/update/merge/delete",
         "username": "",
         "password": "",
-        "column": [{"index":1,"name":"","type":"value/seq/where"}],
+        "column": [{"index":1,"name":"","type":"value/seq/where/date/const/where_date/where_const"}],
         "preSql": [],
         "connection": [
             {
