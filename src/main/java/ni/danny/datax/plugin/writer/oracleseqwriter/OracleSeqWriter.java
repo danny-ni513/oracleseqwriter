@@ -183,6 +183,10 @@ public class OracleSeqWriter extends Writer {
         protected int valueColumnNumber = 0;
         protected int whereColumnNumber = 0;
         protected int seqColumnNumber = 0;
+
+        protected int constColumnNumber = 0;
+        protected int dateColumnNumber = 0;
+
         protected TaskPluginCollector taskPluginCollector;
 
         protected static String BASIC_MESSAGE;
@@ -217,6 +221,9 @@ public class OracleSeqWriter extends Writer {
             this.valueColumnNumber = calcColumnNumberByType(ColumnType.VALUE);
             this.whereColumnNumber = calcColumnNumberByType(ColumnType.WHERE);
             this.seqColumnNumber = calcColumnNumberByType(ColumnType.SEQ);
+            this.constColumnNumber = calcColumnNumberByType(ColumnType.CONST) + calcColumnNumberByType(ColumnType.WHERE_CONST);
+            this.dateColumnNumber = calcColumnNumberByType(ColumnType.DATE) + calcColumnNumberByType(ColumnType.WHERE_DATE);
+
 
             this.preSqls = this.writerSliceConfig.getList(Key.PRE_SQL,String.class);
             this.postSqls = this.writerSliceConfig.getList(Key.POST_SQL,String.class);
@@ -292,8 +299,8 @@ public class OracleSeqWriter extends Writer {
             try{
                 Record record;
                 while((record = recordReceiver.getFromReader()) !=null){
-                    if(record.getColumnNumber() != this.columnNumber-this.seqColumnNumber){
-                        //读取源头字段与目的表字段写入列数(减去自增列)不想等，直接报错
+                    if(record.getColumnNumber() != this.columnNumber-this.seqColumnNumber - this.constColumnNumber - this.dateColumnNumber){
+                        //读取源头字段与目的表字段写入列数(减去自增列,常量列,日期常量列)不相等，直接报错
                         throw DataXException
                                 .asDataXException(
                                         DBUtilErrorCode.CONF_ERROR,
@@ -385,13 +392,25 @@ public class OracleSeqWriter extends Writer {
         }
 
         protected PreparedStatement fillPreparedStatement(PreparedStatement preparedStatement,Record record) throws SQLException{
-            int i=0;
+            int valueIndex=0;
+            int columnIndex = 0;
             for (OracleColumnCell columnCell :this.columns) {
-                if(ColumnType.VALUE.equals(columnCell.getColumnType())||ColumnType.WHERE.equals(columnCell.getColumnType())){
-                    int columnSqlType = this.resultSetMetaData.getMiddle().get(i);
-                    preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqlType, record.getColumn(i));
-                    i++;
-                }
+
+                    if(ColumnType.WHERE.equals(columnCell.getColumnType())){
+                        int columnSqlType = this.resultSetMetaData.getMiddle().get(valueIndex);
+                        preparedStatement = fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, record.getColumn(valueIndex));
+                        columnIndex++;
+                        valueIndex++;
+
+                    }else if(ColumnType.VALUE.equals(columnCell.getColumnType())){
+                        if(!this.writeMode.trim().toLowerCase().startsWith("delete")){
+                            int columnSqlType = this.resultSetMetaData.getMiddle().get(valueIndex);
+                            preparedStatement = fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, record.getColumn(valueIndex));
+                            columnIndex++;
+                        }
+                        valueIndex++;
+                    }
+
             }
 
             return preparedStatement;

@@ -105,11 +105,12 @@ public final class WriterUtil {
     public static String getWriteTemplate(List<OracleColumnCell> columnHolders, String valueHolder, String writeMode, DataBaseType dataBaseType, boolean forceUseUpdate) {
         boolean isWriteModeLegal = writeMode.trim().toLowerCase().startsWith("insert")
                 || writeMode.trim().toLowerCase().startsWith("merge")
-                || writeMode.trim().toLowerCase().startsWith("update");
+                || writeMode.trim().toLowerCase().startsWith("update")
+                || writeMode.trim().toLowerCase().startsWith("delete");
 
         if (!isWriteModeLegal) {
             throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE,
-                    String.format("您所配置的 writeMode:%s 错误. 因为DataX 目前仅支持merger,update 或 insert 方式. 请检查您的配置并作出修改.", writeMode));
+                    String.format("您所配置的 writeMode:%s 错误. 因为DataX 目前仅支持merge,update,insert,delete 方式. 请检查您的配置并作出修改.", writeMode));
         }
         String writeDataSqlTemplate = null;
         if(writeMode.trim().toLowerCase().startsWith("insert")){
