@@ -221,8 +221,8 @@ public class OracleSeqWriter extends Writer {
             this.valueColumnNumber = calcColumnNumberByType(ColumnType.VALUE);
             this.whereColumnNumber = calcColumnNumberByType(ColumnType.WHERE);
             this.seqColumnNumber = calcColumnNumberByType(ColumnType.SEQ);
-            this.constColumnNumber = calcColumnNumberByType(ColumnType.CONST) + calcColumnNumberByType(ColumnType.WHERE_CONST) + calcColumnNumberByType(ColumnType.CONST_DATE);
-            this.dateColumnNumber = calcColumnNumberByType(ColumnType.DATE) + calcColumnNumberByType(ColumnType.WHERE_DATE) + calcColumnNumberByType(ColumnType.CONST_DATE);
+            this.constColumnNumber = calcColumnNumberByType(ColumnType.CONST) + calcColumnNumberByType(ColumnType.WHERE_CONST) + calcColumnNumberByType(ColumnType.CONST_DATE) + calcColumnNumberByType(ColumnType.WHERE_CONST_DATE);
+            this.dateColumnNumber = calcColumnNumberByType(ColumnType.DATE) + calcColumnNumberByType(ColumnType.WHERE_DATE);
 
 
             this.preSqls = this.writerSliceConfig.getList(Key.PRE_SQL,String.class);
@@ -299,7 +299,7 @@ public class OracleSeqWriter extends Writer {
             try{
                 Record record;
                 while((record = recordReceiver.getFromReader()) !=null){
-                    if(record.getColumnNumber() != this.columnNumber-this.seqColumnNumber - this.constColumnNumber - this.dateColumnNumber){
+                    if(record.getColumnNumber() != this.columnNumber - this.seqColumnNumber - this.constColumnNumber){
                         //读取源头字段与目的表字段写入列数(减去自增列,常量列,日期常量列)不相等，直接报错
                         throw DataXException
                                 .asDataXException(
