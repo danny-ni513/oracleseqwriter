@@ -11,8 +11,10 @@ public enum ColumnType {
     WHERE("where"),
     CONST("const"),
     DATE("date"),
+    CONST_DATE("const_date"),
     WHERE_DATE("where_date"),
-    WHERE_CONST("where_const")
+    WHERE_CONST("where_const"),
+    WHERE_CONST_DATE("where_const_date")
     ;
     private String typeName;
 

@@ -221,8 +221,8 @@ public class OracleSeqWriter extends Writer {
             this.valueColumnNumber = calcColumnNumberByType(ColumnType.VALUE);
             this.whereColumnNumber = calcColumnNumberByType(ColumnType.WHERE);
             this.seqColumnNumber = calcColumnNumberByType(ColumnType.SEQ);
-            this.constColumnNumber = calcColumnNumberByType(ColumnType.CONST) + calcColumnNumberByType(ColumnType.WHERE_CONST);
-            this.dateColumnNumber = calcColumnNumberByType(ColumnType.DATE) + calcColumnNumberByType(ColumnType.WHERE_DATE);
+            this.constColumnNumber = calcColumnNumberByType(ColumnType.CONST) + calcColumnNumberByType(ColumnType.WHERE_CONST) + calcColumnNumberByType(ColumnType.CONST_DATE);
+            this.dateColumnNumber = calcColumnNumberByType(ColumnType.DATE) + calcColumnNumberByType(ColumnType.WHERE_DATE) + calcColumnNumberByType(ColumnType.CONST_DATE);
 
 
             this.preSqls = this.writerSliceConfig.getList(Key.PRE_SQL,String.class);

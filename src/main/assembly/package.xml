@@ -14,21 +14,21 @@
                 <include>plugin.json</include>
                 <include>plugin_job_template.json</include>
             </includes>
-            <outputDirectory>plugin/writer/oracelseqwriter</outputDirectory>
+            <outputDirectory>plugin/writer/oracleseqwriter</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>oracelseqwriter-0.0.1-SNAPSHOT.jar</include>
+                <include>oracleseqwriter-1.0-SNAPSHOT.jar</include>
             </includes>
-            <outputDirectory>plugin/writer/oracelseqwriter</outputDirectory>
+            <outputDirectory>plugin/writer/oracleseqwriter</outputDirectory>
         </fileSet>
     </fileSets>
 
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>plugin/writer/oracelseqwriter/libs</outputDirectory>
+            <outputDirectory>plugin/writer/oracleseqwriter/libs</outputDirectory>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
